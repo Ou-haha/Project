@@ -1,0 +1,19 @@
+body{
+    background-color: #eaeaea;
+}
+ul,li{
+    list-style: none;
+}
+a{
+    color: inherit;
+}
+a:hover{
+    text-decoration: none;
+}
+.content{
+    color: #666;
+    font-size: 14px;
+}
+.time{
+    font-size: 12px;
+}

@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+        https://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/context
+        https://www.springframework.org/schema/context/spring-context.xsd
+        http://www.springframework.org/schema/tx
+        http://www.springframework.org/schema/tx/spring-tx.xsd
+        http://www.springframework.org/schema/aop
+        https://www.springframework.org/schema/aop/spring-aop.xsd">
+
+    <context:annotation-config></context:annotation-config>
+    <!--扫描service下的包-->
+    <context:component-scan base-package="com.ou.service.Impl"/>
+    <!--将所有的业务类注入到spring，可以通过配置或者注解实现-->
+    <bean id="userServiceImpl" class="com.ou.service.Impl.UserServiceImpl">
+        <property name="userMapper" ref="userMapper"/>
+    </bean>
+    <bean id="communityServiceImpl" class="com.ou.service.Impl.CommunityServiceImpl">
+        <property name="communityMapper" ref="communityMapper"/>
+    </bean>
+    <bean id="invitationServiceImpl" class="com.ou.service.Impl.InvitationServiceImpl">
+        <property name="invitationMapper" ref="invitationMapper"/>
+    </bean>
+    <bean id="commentServiceImpl" class="com.ou.service.Impl.CommentServiceImpl">
+        <property name="commentMapper" ref="commentMapper"/>
+    </bean>
+    <!--声明式事务添加-->
+    <bean id="transactionManager" class="org.springframework.jdbc.datasource.DataSourceTransactionManager">
+        <!--注入数据源-->
+        <property name="dataSource" ref="datasource"/>
+    </bean>
+    <tx:advice id="txAdvice" transaction-manager="transactionManager">
+        <tx:attributes>
+            <tx:method name="*" propagation="REQUIRED"/>
+        </tx:attributes>
+    </tx:advice>
+    <aop:config>
+        <aop:pointcut id="txPointCut" expression="execution(* com.ou.mapper.UserMapper.*(..))"/>
+        <aop:advisor advice-ref="txAdvice" pointcut-ref="txPointCut"/>
+    </aop:config>
+</beans>

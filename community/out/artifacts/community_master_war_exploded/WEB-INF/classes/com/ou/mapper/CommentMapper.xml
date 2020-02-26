@@ -1,0 +1,79 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ou.mapper.CommentMapper">
+    <!--包含用户信息的评论-->
+    <resultMap id="CommentResultMap" type="CommentUser">
+        <id column="id" property="id"/>
+        <result column="invitation_id" property="invitationId"/>
+        <result column="user_id" property="userId"/>
+        <result column="cin_id" property="cinId"/>
+        <result column="cfor_id" property="cforId"/>
+        <result column="time" property="time"/>
+        <result column="content" property="content"/>
+        <!--关联信息-->
+        <result column="username" property="username"/>
+        <result column="cforusername" property="cforUsername"/>
+    </resultMap>
+
+    <insert id="insert" parameterType="Comment">
+        insert into comment(
+            invitation_id,
+            user_id,
+            <if test="cinId!=null">
+                cin_id,
+            </if>
+            <if test="cforId!=null">
+                cfor_id,
+            </if>
+            time,
+            content
+        )
+        values (
+            #{invitationId},
+            #{userId},
+            <if test="cinId!=null">
+                #{cinId},
+            </if>
+            <if test="cforId!=null">
+                #{cforId},
+            </if>
+            #{time},
+            #{content}
+        )
+    </insert>
+    <!--第一级评论-->
+    <select id="getCommentByInvitationId" parameterType="Integer" resultMap="CommentResultMap">
+        SELECT
+            comment.*,
+            user.`username`
+        FROM
+            comment
+        INNER JOIN user
+            ON user.`id` = comment.`user_id`
+            AND invitation_id = #{invitationId}
+            AND cin_id IS NULL
+    </select>
+    <!--下级评论-->
+    <select id="getCommentByCinId" parameterType="int" resultMap="CommentResultMap">
+            SELECT
+                commentuser.*,
+                user.`username` as cforusername
+            From
+                (SELECT
+                    comment.*,
+                    user.`username`
+                FROM
+                    COMMENT
+                INNER JOIN
+                    USER
+                ON comment.`user_id` = user.`id`
+                AND comment.`cin_id` = #{cinId}) as commentuser
+            LEFT JOIN
+                user
+            ON
+                user.`id` = commentuser.`cfor_id`
+    </select>
+</mapper>

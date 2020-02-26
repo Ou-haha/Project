@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:mvc="http://www.springframework.org/schema/mvc"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+        https://www.springframework.org/schema/beans/spring-beans.xsd
+        http://www.springframework.org/schema/mvc
+        https://www.springframework.org/schema/mvc/spring-mvc.xsd
+        http://www.springframework.org/schema/context
+        https://www.springframework.org/schema/context/spring-context.xsd">
+        <!--1.开启注解驱动-->
+    <mvc:annotation-driven conversion-service="conversionService">
+        <!-- 中文响应转换 -->
+        <mvc:message-converters>
+            <bean class="org.springframework.http.converter.StringHttpMessageConverter">
+                <property name="supportedMediaTypes">
+                    <list>
+                        <value>text/html;charset=UTF-8</value>
+                        <value>text/plain;charset=UTF-8</value>
+                        <value>application/json;charset=UTF-8</value>
+                    </list>
+                </property>
+            </bean>
+        </mvc:message-converters>
+    </mvc:annotation-driven>
+
+    <!-- 日期类型转换器 -->
+    <bean id="conversionService"
+          class="org.springframework.format.support.FormattingConversionServiceFactoryBean">
+        <property name="converters">
+            <set>
+                <bean class="com.ou.converter.DateConverter">
+                    <!-- 自定义日期格式 -->
+                    <property name="pattern" value="yyyy-MM-dd" />
+                </bean>
+            </set>
+        </property>
+    </bean>
+        <!--2.静态资源过滤-->
+        <mvc:default-servlet-handler/>
+        <!--3.扫描包：controller-->
+        <context:component-scan base-package="com.ou.controller"/>
+        <!--4.视图解析器-->
+        <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver" id="InternalResourceViewResolver">
+            <property name="prefix" value="/WEB-INF/view/"/>
+            <property name="suffix" value=".jsp"/>
+        </bean>
+</beans>

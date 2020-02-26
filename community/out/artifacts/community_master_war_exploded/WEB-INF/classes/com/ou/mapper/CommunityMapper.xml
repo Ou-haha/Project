@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.ou.mapper.CommunityMapper">
+
+    <select id="getTopCommunity" resultType="Community">
+        select
+            community.*,
+            Count(invitation.`community_id`)
+        from
+            community
+        inner join
+            invitation
+        on
+            community.`id` = invitation.`community_id`
+        group by
+            invitation.`community_id`
+        order by
+            Count(invitation.`community_id`) desc
+        limit
+            0,6
+    </select>
+    <select id="getById" resultType="Community">
+        select * from community where id = #{id}
+    </select>
+    <select id="getCommunityLikeName" parameterType="String" resultType="Community">
+        select * from community where name like '%${value}%'
+    </select>
+
+</mapper>
